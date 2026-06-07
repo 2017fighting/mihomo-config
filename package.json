@@ -1,6 +1,6 @@
 {
   "name": "mihomo-config",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Type-safe TypeScript library for generating mihomo (Clash Meta) proxy configuration",
   "type": "module",
   "main": "./dist/index.js",
@@ -14,11 +14,16 @@
   "files": [
     "dist"
   ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write src"
+    "format": "prettier --write src",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
