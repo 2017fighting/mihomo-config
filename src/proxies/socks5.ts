@@ -1,5 +1,5 @@
-import { z } from 'zod'
-import { BasicOptionSchema, CommonTLSFieldsSchema } from './common.js'
+import { z } from "zod";
+import { BasicOptionSchema, CommonTLSFieldsSchema } from "./common.js";
 
 export const Socks5OptionsSchema = BasicOptionSchema.extend({
   name: z.string(),
@@ -9,10 +9,10 @@ export const Socks5OptionsSchema = BasicOptionSchema.extend({
   password: z.string().optional(),
   udp: z.boolean(),
   ...CommonTLSFieldsSchema,
-})
+});
 
-export type Socks5Options = z.input<typeof Socks5OptionsSchema>
+export type Socks5Options = z.input<typeof Socks5OptionsSchema>;
 
 export function socks5(options: Socks5Options) {
-  return { type: 'socks5' as const, ...Socks5OptionsSchema.parse(options) }
+  return { type: "socks5" as const, ...Socks5OptionsSchema.parse(options) };
 }

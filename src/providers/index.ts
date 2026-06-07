@@ -1,2 +1,2 @@
-export * from './rule-provider'
-export * from './proxy-provider'
+export * from "./rule-provider";
+export * from "./proxy-provider";

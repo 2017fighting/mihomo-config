@@ -1,4 +1,4 @@
-import yaml from 'js-yaml'
+import yaml from "js-yaml";
 
 export function toYaml(config: Record<string, unknown>): string {
   return yaml.dump(config, {
@@ -8,5 +8,5 @@ export function toYaml(config: Record<string, unknown>): string {
     forceQuotes: false,
     sortKeys: false,
     skipInvalid: true,
-  })
+  });
 }

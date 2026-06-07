@@ -33,4 +33,4 @@ export {
   or,
   not,
   RULE_TYPES,
-} from './types'
+} from "./types";
