@@ -2,6 +2,10 @@
 
 Type-safe TypeScript library for generating [mihomo (Clash Meta)](https://github.com/MetaCubeX/mihomo) proxy configuration dynamically. Runtime validation via [Zod](https://zod.dev), YAML serialization via [js-yaml](https://github.com/nodeca/js-yaml).
 
+## Example
+
+[mihomo-worker](https://github.com/2017fighting/mihomo-worker/blob/main/src/config.ts)
+
 ## Install
 
 ```bash
