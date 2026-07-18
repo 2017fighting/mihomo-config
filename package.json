@@ -1,6 +1,6 @@
 {
   "name": "mihomo-config",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Type-safe TypeScript library for generating mihomo (Clash Meta) proxy configuration",
   "type": "module",
   "main": "./dist/index.js",

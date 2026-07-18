@@ -29,5 +29,8 @@ export const listenerSchema = z.object({
 export type ListenerOptions = z.input<typeof listenerSchema>;
 
 export function listener(options: ListenerOptions) {
-  return listenerSchema.parse(options);
+  // Flatten `extra` to the top level so protocol fields (udp, users, proxy, ...)
+  // land where mihomo expects them, not nested under an `extra:` key.
+  const { extra, ...rest } = listenerSchema.parse(options);
+  return { ...rest, ...(extra ?? {}) };
 }

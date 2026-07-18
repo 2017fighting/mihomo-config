@@ -8,6 +8,7 @@ import {
   dns,
   sniffer,
   experimental,
+  listener,
   ruleProvider,
   proxyProvider,
   ruleSet,
@@ -186,5 +187,32 @@ describe("full config to YAML", () => {
     expect(yaml).toContain("enhanced-mode: redir-host");
     expect(yaml).toContain("MATCH,节点选择");
     expect(yaml).toContain("dialer-ip4p-convert: true");
+  });
+});
+
+describe("listeners", () => {
+  it("flattens `extra` fields to the top level of the listener", () => {
+    const l = listener({
+      name: "mixed-in",
+      type: "mixed",
+      port: 7892,
+      listen: "0.0.0.0",
+      extra: {
+        udp: true,
+        users: [{ username: "u", password: "p" }],
+      },
+    });
+
+    // Protocol fields must be top-level (where mihomo reads them)...
+    const flat = l as Record<string, unknown>;
+    expect(flat.udp).toBe(true);
+    expect(flat.users).toEqual([{ username: "u", password: "p" }]);
+    // ...not nested under a leftover `extra` key.
+    expect(flat.extra).toBeUndefined();
+
+    const yaml = toYaml({ listeners: [l] });
+    expect(yaml).toContain("udp: true");
+    expect(yaml).toContain("username: u");
+    expect(yaml).not.toContain("extra:");
   });
 });
