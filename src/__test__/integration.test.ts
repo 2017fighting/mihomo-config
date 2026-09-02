@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   vless,
   shadowsocks,
+  heybox,
   select,
   urlTest,
   loadBalance,
@@ -51,6 +52,41 @@ describe("proxy factories", () => {
     });
     expect(p.type).toBe("ss");
   });
+
+  it("creates a heybox proxy (小黑盒加速器)", () => {
+    const p = heybox({
+      name: "Switch-通用-日本3",
+      "heybox-id": 16651571,
+      pkey: "MTc4...",
+      "acc-id": 356,
+      "game-id": 0,
+      "server-region": 1,
+      "node-name": "日本3",
+      "acc-mode": 1,
+      "transport-proto": "udp",
+      isp: "liantong",
+      "node-ip": "1.2.3.4",
+      "echo-addr": "1.2.3.4:443",
+      "rtt-avg": 30,
+    });
+    expect(p.type).toBe("heybox");
+    expect(p["heybox-id"]).toBe(16651571);
+    expect(p["node-name"]).toBe("日本3");
+    // 无 server/port:会话由加速服务原子下发
+    expect(p).not.toHaveProperty("server");
+  });
+
+  it("rejects a heybox proxy missing required fields", () => {
+    expect(() =>
+      // @ts-expect-error -- pkey 必填
+      heybox({
+        name: "x",
+        "heybox-id": 1,
+        "acc-id": 356,
+        "node-name": "日本3",
+      }),
+    ).toThrow();
+  });
 });
 
 describe("proxy groups", () => {
@@ -97,6 +133,52 @@ describe("dns + sniffer", () => {
     expect(d["enhanced-mode"]).toBe("redir-host");
   });
 
+  it("creates dns config with preferred-ip", () => {
+    const d = dns({
+      enable: true,
+      "preferred-ip": [
+        {
+          name: "cloudflare",
+          cidr: ["173.245.48.0/20", "103.21.244.0/22"],
+          ipv6: "block",
+          "answer-count": 5,
+          "ttl-cap": 60,
+          persist: true,
+          speedtest: {
+            interval: "24h",
+            threads: 200,
+            "tcp-port": 443,
+            "ping-times": 4,
+            "download-count": 10,
+            "download-time": "10s",
+            "max-delay": "9999ms",
+          },
+        },
+        {
+          name: "gcore",
+          cidr: ["203.104.0.0/16"],
+          speedtest: { interval: 86400, "max-loss-rate": 1.0 },
+        },
+      ],
+    });
+    expect(d["preferred-ip"]).toHaveLength(2);
+    expect(d["preferred-ip"]?.[0]?.speedtest?.interval).toBe("24h");
+    // 秒数形式也可用
+    expect(d["preferred-ip"]?.[1]?.speedtest?.interval).toBe(86400);
+  });
+
+  it("rejects duplicate preferred-ip names (persistence key)", () => {
+    expect(() =>
+      dns({
+        enable: true,
+        "preferred-ip": [
+          { name: "cloudflare", cidr: ["173.245.48.0/20"] },
+          { name: "cloudflare", cidr: ["103.21.244.0/22"] },
+        ],
+      }),
+    ).toThrow(/unique/);
+  });
+
   it("creates sniffer config", () => {
     const s = sniffer({
       enable: true,
@@ -138,6 +220,35 @@ describe("providers", () => {
       url: "https://example.com/sub",
     });
     expect(pp.interval).toBe(86400);
+  });
+
+  it("creates a heybox provider and validates required fields", () => {
+    const pp = proxyProvider({
+      type: "heybox",
+      "heybox-id": 16651571,
+      pkey: "MTc4...",
+      games: [356],
+      interval: 600,
+    });
+    expect(pp.type).toBe("heybox");
+    expect(pp.games).toEqual([356]);
+
+    // 镜像上游校验:heybox-id/pkey/games 必填
+    expect(() =>
+      proxyProvider({
+        type: "heybox",
+        "heybox-id": 16651571,
+        // 缺 pkey 与 games
+      }),
+    ).toThrow(/requires heybox-id and pkey/);
+    expect(() =>
+      proxyProvider({
+        type: "heybox",
+        "heybox-id": 16651571,
+        pkey: "MTc4...",
+        games: [],
+      }),
+    ).toThrow(/requires games/);
   });
 });
 

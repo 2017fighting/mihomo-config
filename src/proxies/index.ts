@@ -13,4 +13,5 @@ export * from "./ssh.js";
 export * from "./anytls.js";
 export * from "./http.js";
 export * from "./shadowsocksr.js";
+export * from "./heybox.js";
 export * from "./direct.js";
