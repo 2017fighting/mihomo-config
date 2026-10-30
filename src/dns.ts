@@ -51,6 +51,12 @@ export const PreferredIPOptionsSchema = z.object({
  cidr: z.string().array().min(1),
  /** replace(默认,用 v6 优选池替换) / block(命中返回空答案);v6 段需列出后 AAAA 才会命中 */
  ipv6: z.enum(["replace", "block"]).optional(),
+ /**
+  * 排除域名(fork exclude-domain,mihomo fork docs/adr/0005):命中的名字
+  * 免于本条目的改写(含 ipv6:block),DNS server 与内部拨号两条路径都生效。
+  * 仅支持 `+.foo.com`(域及子域)与裸精确名两种写法,语法由 mihomo 在配置期校验。
+  */
+ "exclude-domain": z.array(z.string().min(1)).optional(),
  /** 改写后返回的前 N 条,默认 5,范围 [1, 16] */
  "answer-count": z.number().int().min(1).max(16).optional(),
  /** 改写记录 TTL 上限(秒),默认 60 */

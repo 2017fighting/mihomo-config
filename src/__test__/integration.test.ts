@@ -141,6 +141,7 @@ describe("dns + sniffer", () => {
           name: "cloudflare",
           cidr: ["173.245.48.0/20", "103.21.244.0/22"],
           ipv6: "block",
+          "exclude-domain": ["+.argotunnel.com"],
           "answer-count": 5,
           "ttl-cap": 60,
           persist: true,
@@ -163,6 +164,10 @@ describe("dns + sniffer", () => {
     });
     expect(d["preferred-ip"]).toHaveLength(2);
     expect(d["preferred-ip"]?.[0]?.speedtest?.interval).toBe("24h");
+    // 排除域名要原样穿过 schema(改写豁免在 mihomo 侧生效)
+    expect(d["preferred-ip"]?.[0]?.["exclude-domain"]).toEqual([
+      "+.argotunnel.com",
+    ]);
     // 秒数形式也可用
     expect(d["preferred-ip"]?.[1]?.speedtest?.interval).toBe(86400);
   });
